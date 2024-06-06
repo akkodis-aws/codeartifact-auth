@@ -30,11 +30,11 @@ interface CommandLineArguments {
   scope: string | undefined
   region: string | undefined
   accountId: string | undefined
-  packageType: packageTypes | undefined
+  packageType: string | undefined
   help: string | undefined
 }
 
-function setPackageType(input: string): packageTypes {
+function setPackageType(input: string): string {
   try {
     return parsePackageType(input)
   } catch (error) {
@@ -60,7 +60,7 @@ function assignCommandArg(argType: string, value: string, commandArguments: Comm
   if (argType === CmdTypeArgs.repository)
     return commandArguments.repository = value
   if (argType === CmdTypeArgs.packageType)
-    return setPackageType(value)
+    return commandArguments.packageType = value
   if (argType === CmdTypeArgs.scope)
     return commandArguments.scope = value
 }
