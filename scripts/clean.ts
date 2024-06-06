@@ -19,6 +19,6 @@ async function removeBuildFolder(target: string): Promise<void> {
   const filePath = path.resolve(`./${target}`)
   if (fs.existsSync(filePath)) {
     console.log(`Cleaning ${target}`)
-    fs.rmdirSync(filePath, {recursive: true})
+    fs.rm(filePath, {recursive: true}, (err) => { console.error(err) })
   }
 }

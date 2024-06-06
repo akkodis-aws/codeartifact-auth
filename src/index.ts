@@ -1,4 +1,4 @@
-import CodeArtifact from 'aws-sdk/clients/codeartifact'
+import {Codeartifact} from '@aws-sdk/client-codeartifact'
 import {execSync} from 'child_process'
 import {awsCodeArtifactConfig, packageTypes} from './types'
 
@@ -34,13 +34,15 @@ function parseConfig(config: awsCodeArtifactConfig): awsCodeArtifactConfig {
   }
 }
 
-async function getAuthorizationToken(domain: string, accountId: string): Promise<string> {
-  const codeArtifact = new CodeArtifact()
+async function getAuthorizationToken(domain: string, accountId: string, region: string): Promise<string> {
+  const codeArtifact = new Codeartifact({
+    region: region
+  })
   const params = {
     domain,
     domainOwner: accountId,
   }
-  const token = await codeArtifact.getAuthorizationToken(params).promise().catch(e => errorHandler(e))
+  const token = await codeArtifact.getAuthorizationToken(params).catch(e => errorHandler(e))
   if (token?.authorizationToken === undefined)
     throw errorHandler('Failed to retrieve auth token')
   return token.authorizationToken
@@ -79,7 +81,7 @@ function getScopeTarget(scope: string | undefined): string {
 async function setNpmConfig(config: awsCodeArtifactConfig): Promise<void> {
   const {domain, accountId, region, repository, scope} = parseConfig(config)
 
-  const token = await getAuthorizationToken(domain, accountId)
+  const token = await getAuthorizationToken(domain, accountId, region)
   const codeartifactUrl = `${domain}-${accountId}.d.codeartifact.${region}.amazonaws.com/npm/${repository}/`
   const endpoint = `//${codeartifactUrl}`
   const scopeTarget = getScopeTarget(scope)
@@ -95,9 +97,9 @@ async function setNpmConfig(config: awsCodeArtifactConfig): Promise<void> {
 }
 
 async function setPoetryConfig(config: awsCodeArtifactConfig): Promise<void> {
-  const {domain, accountId} = parseConfig(config)
+  const {domain, accountId, region} = parseConfig(config)
 
-  const token = await getAuthorizationToken(domain, accountId)
+  const token = await getAuthorizationToken(domain, accountId, region)
 
   execSync(`poetry config http-basic.mondo "aws" "${token}"`)
 

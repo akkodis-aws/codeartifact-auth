@@ -2,6 +2,8 @@
 
 This repo houses a CLI tool and custom Github Action for authenticating npm with AWS codeartifact.
 
+Forked from the great work at https://github.com/MondoPower/codeartifact-auth
+
 ## Quickstart
 
 ### Github Action
@@ -10,7 +12,7 @@ This repo houses a CLI tool and custom Github Action for authenticating npm with
 
 The below action will setup npm with the codeartifact registry scoped to the referenced package.
 
-```yaml
+```yam
 - name: Configure AWS Credentials
   uses: aws-actions/configure-aws-credentials@v2
   with:
@@ -18,7 +20,7 @@ The below action will setup npm with the codeartifact registry scoped to the ref
     role-session-name: "<Sessions name>"
     aws-region: "<AWS region>"
 - name: Configure npm with AWS CodeArtifact
-  uses: MondoPower/codeartifact-auth@1.1.7
+  uses: akkodis-aws/codeartifact-auth@v3
   with:       
     domain: "<Domain in AWS CodeArtifact>"
     repository: "<Repository in AWS CodeArtifact>"

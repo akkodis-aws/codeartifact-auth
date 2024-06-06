@@ -29,29 +29,29 @@ jobs:
   publish:
     name: Publish to NPM
     runs-on: ubuntu-latest
-    if: github.repository == 'MondoPower/codeartifact-auth' && !(github.event_name == 'pull_request')
+    if: github.repository == 'akkodis-aws/codeartifact-auth' && !(github.event_name == 'pull_request')
     needs: verify
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
       - run: npm --silent ci --quiet --no-progress --no-audit --unsafe-perm --loglevel warn
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
           access: public
-  slack:
-    name: Notify Slack on failure
-    needs: publish
-    if: github.repository == 'MondoPower/codeartifact-auth' && !(github.event_name == 'pull_request') && failure()
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_TITLE: Failed commit message
-          SLACK_COLOR: "#FF0000"
-          SLACK_FOOTER: Powered by MondoPower
+  # slack:
+  #   name: Notify Slack on failure
+  #   needs: publish
+  #   if: github.repository == 'akkodis-aws/codeartifact-auth' && !(github.event_name == 'pull_request') && failure()
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Slack Notification
+  #       uses: rtCamp/action-slack-notify@v2
+  #       env:
+  #         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+  #         SLACK_TITLE: Failed commit message
+  #         SLACK_COLOR: "#FF0000"
+  #         SLACK_FOOTER: Powered by MondoPower
