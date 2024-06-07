@@ -48,8 +48,9 @@ async function getAuthorizationToken(domain: string, accountId: string, region: 
   return token.authorizationToken
 }
 
-function validateAWSConfigVariables(): void {
-  if (!process.env.AWS_REGION)
+// eslint-disable-next-line complexity
+function validateAWSConfigVariables(config: awsCodeArtifactConfig): void {
+  if (!process.env.AWS_REGION && !config.region)
     errorHandler('Missing AWS region environment variable. Please make sure that you assume a role!')
   if (!process.env.AWS_SESSION_TOKEN)
     errorHandler('Missing AWS session token environment variable. Please make sure that you assume a role!')
@@ -60,9 +61,9 @@ function validateAWSConfigVariables(): void {
 }
 
 function npmVersionIsLowerThan(version: number): boolean {
-  const npmVersion = execSync('npm --version').toString()
+  const npmVersion = execSync('npm --version').toString().split('.')
   const npmMajorVersion = Number(npmVersion[0])
-  console.log(`NPM version: ${npmVersion[0]}`)
+  console.log(`NPM version: ${npmMajorVersion}`)
   if (isNaN(npmMajorVersion)) {
     console.error(`Invalid version returned: ${npmVersion}`)
     throw new Error('Could not find npm version')
@@ -108,7 +109,7 @@ async function setPoetryConfig(config: awsCodeArtifactConfig): Promise<void> {
 }
 
 export async function main(config: awsCodeArtifactConfig): Promise<void> {
-  validateAWSConfigVariables()
+  validateAWSConfigVariables(config)
   if (config.packageType === packageTypes.npm)
     await setNpmConfig(config)
   else if (config.packageType === packageTypes.poetry)
