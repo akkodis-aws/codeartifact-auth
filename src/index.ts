@@ -60,6 +60,15 @@ function validateAWSConfigVariables(config: awsCodeArtifactConfig): void {
     errorHandler('Missing AWS access key id environment variable. Please make sure that you assume a role!')
 }
 
+function detectYarn(): boolean {
+  try {
+    execSync('ls yarn.lock')
+    return true
+  } catch (e) {
+    return false
+  }
+}
+
 function npmVersionIsLowerThan(version: number): boolean {
   const npmVersion = execSync('npm --version').toString().split('.')
   const npmMajorVersion = Number(npmVersion[0])
@@ -93,6 +102,10 @@ async function setNpmConfig(config: awsCodeArtifactConfig): Promise<void> {
   if (npmVersionIsLowerThan(9)) {
     console.log('Legacy version of NPM detected setting always-auth')
     execSync(`npm config set ${endpoint}:always-auth=true`)
+  } else if (detectYarn()) {
+    // NPM > 9 removed always-auth as a valid config option, but yarn v1 still relies on it for auth
+    console.log('NPM > 9 and yarn.lock detected - manually setting always-auth in ~/.npmrc')
+    execSync(`echo "${endpoint}:always-auth=true" >> ~/.npmrc`)
   }
   console.log(`npm credentials configured for endpoint: ${codeartifactUrl}`)
 }
